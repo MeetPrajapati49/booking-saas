@@ -9,11 +9,14 @@
     "test": "node --test src/index.test.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.3.0",
+    "@supabase/supabase-js": "^2.109.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
+    "pg": "^8.21.0",
     "uuid": "^10.0.0",
-    "bcryptjs": "^2.4.3"
+    "ws": "^8.21.3"
   }
 }
