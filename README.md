@@ -1,6 +1,6 @@
 # Multi-Tenant Appointment & Booking SaaS
 
-This repository implements the assessment-spec booking SaaS as a focused local MVP that is intentionally easy to run and review. The app includes:
+This repository implements a multi-tenant booking SaaS application. The app includes:
 
 - Business signup/login with JWT auth
 - Tenant-scoped dashboard data access
@@ -11,21 +11,20 @@ This repository implements the assessment-spec booking SaaS as a focused local M
 - Booking status changes, cancellation, and rescheduling
 - Client CRM/search data
 - Billing-state simulation and reminder job endpoints
-- Demo seed data for two sample businesses
 
 ## Architecture
 
-- Frontend: React + Vite
-- Backend: Express + SQLite
-- Auth: JWT-based tenant context in the API layer
-- Database: SQLite for local reproducibility; designed to map cleanly to Postgres + RLS in production
+- **Frontend**: React + Vite (Deployed on Vercel)
+- **Backend**: Express (Deployed on Vercel Serverless Functions)
+- **Auth**: JWT-based tenant context in the API layer
+- **Database**: Supabase (PostgreSQL)
 
 ## Tech stack
 
 - React 19
 - Vite
 - Express 4
-- better-sqlite3
+- Supabase JS Client (`@supabase/supabase-js`)
 - bcryptjs
 - JWT auth
 
@@ -37,13 +36,26 @@ This repository implements the assessment-spec booking SaaS as a focused local M
 cd backend
 npm install
 cp .env.example .env
-npm run seed
-npm start
 ```
 
-The API runs on:
+Edit your `backend/.env` to include your Supabase credentials:
+```dotenv
+PORT=4000
+JWT_SECRET=dev-secret-change-me
+SUPABASE_URL=https://<your-project>.supabase.co
+SUPABASE_SERVICE_KEY=eyJ...
+```
 
-- http://localhost:4000
+To seed the database with sample data:
+```bash
+npm run seed
+```
+
+Start the API:
+```bash
+npm start
+```
+The API runs on `http://localhost:4000`.
 
 ### 2) Frontend
 
@@ -51,23 +63,35 @@ The API runs on:
 cd frontend
 npm install
 cp .env.example .env
-npm run dev -- --host 0.0.0.0
 ```
 
-The app runs on:
+Edit your `frontend/.env`:
+```dotenv
+VITE_API_URL=http://localhost:4000
+```
 
-- http://localhost:5173
+Start the dev server:
+```bash
+npm run dev
+```
+The app runs on `http://localhost:5173`.
 
-## Demo credentials
+## Deployment
 
-After seeding:
+Both the frontend and backend are optimized for deployment on Vercel as two separate projects.
 
-- Glow Hair Studio
-  - Public URL: /booking/glow-hair-studio
-  - Owner login: owner@glowhair.demo / demo1234
-- Bright Smile Dental
-  - Public URL: /booking/bright-smile-dental
-  - Owner login: owner@brightsmile.demo / demo1234
+### Backend Deployment
+1. Import the repository into Vercel and set the Root Directory to `backend`.
+2. Add the following Environment Variables:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_KEY`
+   - `JWT_SECRET`
+
+### Frontend Deployment
+1. Import the repository into Vercel and set the Root Directory to `frontend`.
+2. Ensure the Framework Preset is set to Vite.
+3. Add the following Environment Variable:
+   - `VITE_API_URL` (Set to your deployed backend URL, e.g., `https://my-backend.vercel.app`)
 
 ## Core features
 
@@ -91,59 +115,3 @@ After seeding:
 - Client search and CRM view
 - Billing status + payment-plan simulation
 - Reminder job endpoint for follow-up notifications
-
-### Tenant safety and scheduling correctness
-
-- Business data is scoped by business_id in all tenant-protected API routes
-- Availability generation rejects overlapping bookings and blocked periods
-- Bookings are protected by a transaction-based slot check before insertion
-- Reschedule validation uses the same overlap rules as a new booking
-
-## Environment variables
-
-### backend/.env.example
-
-```dotenv
-PORT=4000
-JWT_SECRET=dev-secret-change-me
-```
-
-### frontend/.env.example
-
-```dotenv
-VITE_API_URL=http://localhost:4000
-```
-
-## Testing
-
-```bash
-cd backend
-npm test
-```
-
-The test suite covers:
-
-- signup + token creation
-- tenant isolation
-- invalid token rejection
-- double-booking prevention
-- cancellation freeing a slot
-
-## Notes and trade-offs
-
-This implementation follows the assessment spec in spirit but intentionally stays local-first for reliability in a coding environment without external services. The code is structured so the same design can be mapped to Postgres + Supabase RLS + Stripe + cron jobs in production.
-
-Known limitations:
-
-- Local SQLite instead of Supabase/Postgres
-- JWT auth instead of Supabase Auth
-- Simulated billing and reminder queue rather than real provider integration
-- Booking environment is evaluated as a local app, not a live cloud deployment
-
-## Future upgrades
-
-- Replace SQLite with Supabase Postgres and RLS policies
-- Add provider/resource scheduling and multiple staff calendars
-- Add webhook-verified billing and subscription gating
-- Add cron-based reminder automation and notification providers
-- Add full calendar views and analytics
