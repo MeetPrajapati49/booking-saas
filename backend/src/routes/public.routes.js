@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import supabase from '../db.js';
-import { checkSlotAvailable, createBookingSafely } from '../availability.js';
+import { getAvailableSlots, checkSlotAvailable, createBookingSafely } from '../availability.js';
 
 const router = Router();
 
