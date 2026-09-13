@@ -1,34 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 
 export default function Services() {
-  const [services, setServices] = useState([]);
+  const queryClient = useQueryClient();
+  const { data: services = [], isLoading } = useQuery({ queryKey: ['services'], queryFn: api.services });
   const [form, setForm] = useState({ name: '', durationMinutes: 30, price: 0 });
   const [error, setError] = useState('');
 
-  function refresh() { api.services().then(setServices); }
-  useEffect(refresh, []);
+  const saveMutation = useMutation({
+    mutationFn: (payload) => api.createService(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      setForm({ name: '', durationMinutes: 30, price: 0 });
+    }
+  });
 
-  async function addService(e) {
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, active }) => api.updateService(id, { active }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['services'] })
+  });
+
+  async function handleSave(e) {
     e.preventDefault();
     setError('');
-    try {
-      await api.createService(form);
-      setForm({ name: '', durationMinutes: 30, price: 0 });
-      refresh();
-    } catch (err) { setError(err.message); }
+    saveMutation.mutate({ name: form.name, durationMinutes: Number(form.durationMinutes), price: Number(form.price) });
   }
 
   async function toggleActive(s) {
-    await api.updateService(s.id, { active: s.active ? 0 : 1 });
-    refresh();
+    toggleMutation.mutate({ id: s.id, active: s.active ? 0 : 1 });
   }
 
   return (
     <div>
       <h1 style={{ fontSize: '1.6rem', marginBottom: '1.4rem' }}>Services</h1>
 
-      <form onSubmit={addService} className="panel" style={{ marginBottom: '1.4rem', display: 'flex', gap: '0.8rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+      <form onSubmit={handleSave} className="panel" style={{ marginBottom: '1.4rem', display: 'flex', gap: '0.8rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
         <div className="field" style={{ marginBottom: 0, flex: '1 1 160px' }}>
           <label>Name</label>
           <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />

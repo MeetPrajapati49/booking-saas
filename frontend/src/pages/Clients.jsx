@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/AuthContext';
 
 export default function Clients() {
   const { business } = useAuth();
-  const [clients, setClients] = useState([]);
+  const [q, setQ] = useState('');
+  const { data: clients = [], isLoading } = useQuery({
+    queryKey: ['clients', q],
+    queryFn: () => api.clients(q)
+  });
   const [emailModal, setEmailModal] = useState(null);
   const [sending, setSending] = useState(false);
   const [toast, setToast] = useState('');
@@ -20,18 +25,8 @@ export default function Clients() {
     setTimeout(() => setToast(''), 3000);
   };
 
-  const [q, setQ] = useState('');
-
-  function refresh(search = '') {
-    api.clients(search).then(setClients).catch(() => setClients([]));
-  }
-
-  useEffect(() => { refresh(); }, []);
-
   const onSearch = (e) => {
-    const value = e.target.value;
-    setQ(value);
-    refresh(value);
+    setQ(e.target.value);
   };
 
   return (

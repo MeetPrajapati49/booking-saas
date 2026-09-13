@@ -1,12 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 
 export default function Calendar() {
-  const [bookings, setBookings] = useState([]);
-
-  useEffect(() => {
-    api.bookings().then(setBookings);
-  }, []);
+  const { data: bookings = [], isLoading } = useQuery({ queryKey: ['bookings'], queryFn: api.bookings });
 
   // Group bookings by date string (YYYY-MM-DD)
   const grouped = bookings.reduce((acc, b) => {
@@ -19,6 +15,8 @@ export default function Calendar() {
 
   // Sort dates
   const sortedDates = Object.keys(grouped).sort((a, b) => new Date(a) - new Date(b));
+
+  if (isLoading) return <p style={{ color: 'var(--ink-soft)' }}>Loading calendar...</p>;
 
   return (
     <div>

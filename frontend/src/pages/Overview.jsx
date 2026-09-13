@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 
 export default function Overview() {
-  const [summary, setSummary] = useState(null);
-
-  useEffect(() => { api.summary().then(setSummary); }, []);
+  const { data: summary } = useQuery({ queryKey: ['summary'], queryFn: api.summary });
 
   const cards = summary ? [
     { label: "Today's appointments", value: summary.todaysAppointments },

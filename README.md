@@ -1,29 +1,32 @@
 # Multi-Tenant Appointment & Booking SaaS
 
-This repository implements a multi-tenant booking SaaS application. The app includes:
+This repository implements a premium multi-tenant booking SaaS application designed with a sleek, editorial aesthetic and a robust modular architecture.
 
-- Business signup/login with JWT auth
-- Tenant-scoped dashboard data access
-- Public booking pages by slug
-- Service configuration and business hours
-- Slot generation based on service duration and business schedule
-- Booking creation with server-side revalidation and overlap protection
-- Booking status changes, cancellation, and rescheduling
-- Client CRM/search data
-- Billing-state simulation and reminder job endpoints
+## Features
+
+- **Editorial Design System**: Flat, modern UI with Fraunces and Work Sans typography.
+- **Professional State Management**: Fully integrated with `@tanstack/react-query` for flawless async state management, optimistic updates, and cache invalidation.
+- **Modular API Architecture**: Controller and router-based Express backend using `express-async-errors` for centralized, crash-proof error handling.
+- **Strict Payload Validation**: Full `zod` integration on all API endpoints to protect database integrity.
+- **Tenant-Scoped Data**: JWT auth securely isolates business data and dashboard access.
+- **Availability Engine**: Slot generation based on service duration, business schedule, and overlapping bookings.
+- **Client CRM**: Native searchable client database with booking histories.
 
 ## Architecture
 
-- **Frontend**: React + Vite (Deployed on Vercel)
-- **Backend**: Express (Deployed on Vercel Serverless Functions)
+- **Frontend**: React + Vite + `@tanstack/react-query` (Deployed on Vercel)
+- **Backend**: Express modular monolith with `zod` validation (Deployed on Vercel Serverless Functions)
 - **Auth**: JWT-based tenant context in the API layer
 - **Database**: Supabase (PostgreSQL)
 
 ## Tech stack
 
 - React 19
+- `@tanstack/react-query`
 - Vite
 - Express 4
+- `zod`
+- `express-async-errors`
 - Supabase JS Client (`@supabase/supabase-js`)
 - bcryptjs
 - JWT auth
@@ -92,26 +95,3 @@ Both the frontend and backend are optimized for deployment on Vercel as two sepa
 2. Ensure the Framework Preset is set to Vite.
 3. Add the following Environment Variable:
    - `VITE_API_URL` (Set to your deployed backend URL, e.g., `https://my-backend.vercel.app`)
-
-## Core features
-
-### Public booking flow
-
-- Business lookup by slug
-- Service list and price display
-- Date-based availability fetch
-- Slot selection
-- Client details capture
-- Booking creation
-- 409 conflict handling when a slot is taken concurrently
-
-### Business dashboard
-
-- Overview metrics
-- Bookings list
-- Status transitions (confirm / complete / cancel / no-show)
-- Service management
-- Business hours configuration
-- Client search and CRM view
-- Billing status + payment-plan simulation
-- Reminder job endpoint for follow-up notifications

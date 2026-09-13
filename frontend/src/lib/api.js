@@ -1,18 +1,6 @@
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
-const cache = new Map();
-
 async function request(path, { method = 'GET', body, auth = false } = {}) {
-  const cacheKey = `${method}:${path}`;
-
-  if (method === 'GET' && cache.has(cacheKey)) {
-    const { data, timestamp } = cache.get(cacheKey);
-    // Cache valid for 60 seconds
-    if (Date.now() - timestamp < 60000) {
-      return data;
-    }
-  }
-
   const headers = { 'Content-Type': 'application/json' };
   if (auth) {
     const token = localStorage.getItem('token');
@@ -25,14 +13,6 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || 'Request failed');
-
-  if (method === 'GET') {
-    cache.set(cacheKey, { data, timestamp: Date.now() });
-  } else {
-    // Invalidate all cache on any mutation (POST/PATCH/DELETE)
-    cache.clear();
-  }
-
   return data;
 }
 

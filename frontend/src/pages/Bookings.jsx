@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 
 const NEXT_ACTIONS = {
@@ -10,25 +11,27 @@ const NEXT_ACTIONS = {
 };
 
 export default function Bookings() {
-  const [bookings, setBookings] = useState([]);
+  const queryClient = useQueryClient();
+  const { data: bookings = [], isLoading } = useQuery({ queryKey: ['bookings'], queryFn: api.bookings });
+  
   const [rescheduleId, setRescheduleId] = useState(null);
   const [rescheduleAt, setRescheduleAt] = useState('');
 
-  function refresh() { api.bookings().then(setBookings); }
-  useEffect(refresh, []);
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }) => api.updateBooking(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bookings'] })
+  });
 
-  async function setStatus(b, status) {
-    await api.updateBooking(b.id, { status });
-    refresh();
-  }
+  const rescheduleMutation = useMutation({
+    mutationFn: ({ id, startsAt }) => api.rescheduleBooking(id, { startsAt }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      setRescheduleId(null);
+      setRescheduleAt('');
+    }
+  });
 
-  async function handleReschedule(b) {
-    if (!rescheduleAt) return;
-    await api.rescheduleBooking(b.id, { startsAt: rescheduleAt });
-    setRescheduleId(null);
-    setRescheduleAt('');
-    refresh();
-  }
+  if (isLoading) return <p style={{ color: 'var(--ink-soft)' }}>Loading bookings...</p>;
 
   return (
     <div>
@@ -46,7 +49,8 @@ export default function Bookings() {
               <span className={`badge badge-${b.status}`}>{b.status.replace('_', ' ')}</span>
               {NEXT_ACTIONS[b.status]?.map(([status, label]) => (
                 <button key={status} className="btn btn-secondary" style={{ padding: '0.35rem 0.7rem', fontSize: '0.8rem' }}
-                  onClick={() => setStatus(b, status)}>
+                  disabled={statusMutation.isPending}
+                  onClick={() => statusMutation.mutate({ id: b.id, status })}>
                   {label}
                 </button>
               ))}
@@ -61,7 +65,7 @@ export default function Bookings() {
             {rescheduleId === b.id && (
               <div style={{ width: '100%', display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
                 <input type="datetime-local" value={rescheduleAt} onChange={(e) => setRescheduleAt(e.target.value)} style={{ flex: 1 }} />
-                <button className="btn btn-primary" onClick={() => handleReschedule(b)}>Save</button>
+                <button className="btn btn-primary" disabled={rescheduleMutation.isPending} onClick={() => rescheduleMutation.mutate({ id: b.id, startsAt: rescheduleAt })}>Save</button>
               </div>
             )}
           </div>
