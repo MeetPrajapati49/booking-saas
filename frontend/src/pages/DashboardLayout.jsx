@@ -2,13 +2,13 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 
 const links = [
-  { to: '/dashboard', label: 'Overview', end: true },
-  { to: '/dashboard/calendar', label: 'Calendar' },
-  { to: '/dashboard/bookings', label: 'Bookings' },
-  { to: '/dashboard/clients', label: 'Clients' },
-  { to: '/dashboard/services', label: 'Services' },
-  { to: '/dashboard/hours', label: 'Hours' },
-  { to: '/dashboard/billing', label: 'Billing' },
+  { to: '/dashboard', label: 'Overview', end: true, icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg> },
+  { to: '/dashboard/calendar', label: 'Calendar', icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> },
+  { to: '/dashboard/bookings', label: 'Bookings', icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg> },
+  { to: '/dashboard/clients', label: 'Clients', icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> },
+  { to: '/dashboard/services', label: 'Services', icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+  { to: '/dashboard/hours', label: 'Hours', icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> },
+  { to: '/dashboard/billing', label: 'Billing', icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><path d="M1 10h22"/></svg> },
 ];
 
 import { useState } from 'react';
@@ -67,7 +67,10 @@ export default function DashboardLayout() {
                 transition: 'all 0.2s ease'
               })}
             >
-              {l.label}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                {l.icon}
+                {l.label}
+              </div>
             </NavLink>
           ))}
         </nav>
