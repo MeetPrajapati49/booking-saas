@@ -61,7 +61,7 @@ export default function Clients() {
                     className="btn btn-primary"
                     style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', border: 'none' }}
                   >
-                    Send Booking Link ✉️
+                    Send Booking Link
                   </button>
                 )}
               </div>
