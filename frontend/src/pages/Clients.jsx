@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { useAuth } from '../lib/AuthContext';
 
 export default function Clients() {
+  const { business } = useAuth();
   const [clients, setClients] = useState([]);
   const [q, setQ] = useState('');
 
@@ -36,7 +38,18 @@ export default function Clients() {
                   {client.email || 'No email'} · {client.phone || 'No phone'}
                 </div>
               </div>
-              <span className="badge badge-confirmed">CRM</span>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <span className="badge badge-confirmed">CRM</span>
+                {client.email && business && (
+                  <a 
+                    href={`mailto:${client.email}?subject=Book your next appointment with ${encodeURIComponent(business.name)}&body=Hi ${encodeURIComponent(client.name)},%0D%0A%0D%0AYou can book your next appointment directly through my booking page here:%0D%0A${encodeURIComponent(window.location.origin + '/booking/' + business.slug)}%0D%0A%0D%0AThanks!`}
+                    className="btn btn-primary"
+                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+                  >
+                    Send Booking Link ✉️
+                  </a>
+                )}
+              </div>
             </div>
             {client.notes && (
               <p style={{ margin: '0.8rem 0 0', fontSize: '0.86rem', color: 'var(--ink-soft)' }}>{client.notes}</p>

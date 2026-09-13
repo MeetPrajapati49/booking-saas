@@ -80,15 +80,24 @@ export default function PublicBooking() {
   if (error && !business) return <CenteredMessage>{error}</CenteredMessage>;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--paper)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--paper)', display: 'flex', flexDirection: 'column' }}>
       <header style={{
-        padding: '2.2rem 1.5rem 1.6rem', textAlign: 'center', borderBottom: '1px solid var(--line)',
+        padding: '3rem 1.5rem 2rem', textAlign: 'center', 
+        background: 'linear-gradient(to bottom, #ffffff, var(--paper))',
+        borderBottom: '1px solid var(--line)'
       }}>
-        <h1 style={{ fontSize: '2rem' }}>{business.name}</h1>
-        <p style={{ color: 'var(--ink-soft)', marginTop: '0.4rem' }}>Book an appointment in a couple of taps.</p>
+        <div style={{ 
+          width: 72, height: 72, background: 'var(--accent)', color: '#fff', 
+          borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          margin: '0 auto 1.2rem', fontSize: '2rem', fontWeight: 700, boxShadow: 'var(--shadow-md)' 
+        }}>
+          {business.name.charAt(0).toUpperCase()}
+        </div>
+        <h1 style={{ fontSize: '2.2rem', letterSpacing: '-0.03em', fontWeight: 700 }}>{business.name}</h1>
+        <p style={{ color: 'var(--ink-soft)', marginTop: '0.6rem', fontSize: '1.05rem' }}>Book an appointment in a couple of taps.</p>
       </header>
 
-      <main style={{ maxWidth: 560, margin: '0 auto', padding: '1.6rem 1.2rem 4rem' }}>
+      <main style={{ maxWidth: 640, width: '100%', margin: '0 auto', padding: '2.5rem 1.5rem 5rem' }}>
         <Steps step={step} />
 
         {step === 1 && (
@@ -208,13 +217,25 @@ export default function PublicBooking() {
 function Steps({ step }) {
   const labels = ['Service', 'Time', 'Details', 'Done'];
   return (
-    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
       {labels.map((l, i) => (
-        <div key={l} style={{
-          fontSize: '0.75rem', fontWeight: 600,
-          color: step >= i + 1 ? 'var(--accent)' : 'var(--ink-soft)',
-        }}>
-          {l}{i < labels.length - 1 ? ' ·' : ''}
+        <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{
+            width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '0.75rem', fontWeight: 600,
+            background: step >= i + 1 ? 'var(--accent)' : 'var(--line)',
+            color: step >= i + 1 ? '#fff' : 'var(--ink-soft)',
+            transition: 'all 0.3s ease'
+          }}>
+            {i + 1}
+          </div>
+          <span style={{
+            fontSize: '0.85rem', fontWeight: 600,
+            color: step >= i + 1 ? 'var(--ink)' : 'var(--ink-soft)',
+          }}>
+            {l}
+          </span>
+          {i < labels.length - 1 && <div style={{ width: 16, height: 2, background: 'var(--line)', marginLeft: '0.6rem' }} />}
         </div>
       ))}
     </div>

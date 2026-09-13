@@ -1,18 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
 
 :root {
-  --ink: #15201c;
-  --ink-soft: #445048;
-  --paper: #f3f4ef;
+  --ink: #0f172a;
+  --ink-soft: #64748b;
+  --paper: #f8fafc;
   --paper-raised: #ffffff;
-  --line: #d9dcd2;
-  --accent: #b5772f;
+  --line: #e2e8f0;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
   --accent-ink: #ffffff;
-  --teal: #3e6c63;
-  --danger: #a3402f;
-  --radius: 6px;
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Work Sans', sans-serif;
+  --teal: #0f766e;
+  --danger: #e11d48;
+  --radius: 12px;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; }
@@ -51,13 +55,20 @@ input, select, textarea {
   border: 1px solid transparent;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
-.btn:hover { opacity: 0.85; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 .btn-primary { background: var(--accent); color: var(--accent-ink); }
-.btn-secondary { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-secondary { background: var(--paper-raised); border-color: var(--line); color: var(--ink); }
+.btn-secondary:hover:not(:disabled) { background: var(--paper); }
 .btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
 .btn-ghost { background: transparent; color: var(--ink-soft); }
 
@@ -83,8 +94,14 @@ input, select, textarea {
 .panel {
   background: var(--paper-raised);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 1.4rem;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.panel:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .error-text { color: var(--danger); font-size: 0.85rem; margin: 0.3rem 0; }
