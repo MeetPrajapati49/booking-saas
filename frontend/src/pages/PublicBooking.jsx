@@ -18,6 +18,7 @@ export default function PublicBooking() {
   const [date, setDate] = useState(todayISODate());
   const [slots, setSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const [step, setStep] = useState(1); // 1 service, 2 time, 3 details, 4 confirmed
   const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' });
   const [confirmedBooking, setConfirmedBooking] = useState(null);
@@ -45,9 +46,11 @@ export default function PublicBooking() {
     if (!selectedService) return;
     setSlots([]);
     setSelectedSlot(null);
+    setSlotsLoading(true);
     api.publicAvailability(slug, selectedService.id, date)
       .then((r) => setSlots(r.slots || []))
-      .catch(() => setSlots([]));
+      .catch(() => setSlots([]))
+      .finally(() => setSlotsLoading(false));
   }, [selectedService, date, slug]);
 
   async function submitBooking(e) {
@@ -127,7 +130,9 @@ export default function PublicBooking() {
               <label>Date</label>
               <input type="date" min={todayISODate()} value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
-            {slots.length === 0 ? (
+            {slotsLoading ? (
+              <p style={{ color: 'var(--ink-soft)' }}>Checking availability...</p>
+            ) : slots.length === 0 ? (
               <p style={{ color: 'var(--ink-soft)' }}>No slots available this day — try another date.</p>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(84px, 1fr))', gap: '0.5rem' }}>

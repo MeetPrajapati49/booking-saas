@@ -19,29 +19,34 @@ function overlaps(aStart, aEnd, bStart, bEnd) {
 }
 
 export async function getAvailableSlots(businessId, serviceId, dateStr) {
-  const { data: service } = await supabase.from('services').select('*').eq('id', serviceId).eq('business_id', businessId).eq('active', 1).maybeSingle();
-  if (!service) return { error: 'Service not found' };
-
-  // Get Day of week. 0=Sun, 1=Mon, etc. (assuming dateStr is local, but doing UTC for simplicity)
   const d = new Date(`${dateStr}T00:00:00Z`);
   const dow = d.getUTCDay();
-  
-  const { data: hours } = await supabase.from('business_hours').select('*').eq('business_id', businessId).eq('day_of_week', dow).eq('enabled', 1).maybeSingle();
+
+  const [serviceRes, hoursRes, blockedRes, bookingsRes] = await Promise.all([
+    supabase.from('services').select('*').eq('id', serviceId).eq('business_id', businessId).eq('active', 1).maybeSingle(),
+    supabase.from('business_hours').select('*').eq('business_id', businessId).eq('day_of_week', dow).eq('enabled', 1).maybeSingle(),
+    supabase.from('blocked_periods').select('*')
+      .eq('business_id', businessId)
+      .lte('starts_at', `${dateStr}T23:59:59Z`)
+      .gte('ends_at', `${dateStr}T00:00:00Z`),
+    supabase.from('bookings').select('*')
+      .eq('business_id', businessId)
+      .neq('status', 'cancelled')
+      .gte('starts_at', `${dateStr}T00:00:00Z`)
+      .lte('starts_at', `${dateStr}T23:59:59Z`)
+  ]);
+
+  const { data: service } = serviceRes;
+  if (!service) return { error: 'Service not found' };
+
+  const { data: hours } = hoursRes;
   if (!hours) return { slots: [] }; // closed that day
 
   const dayStartMin = toMinutes(hours.start_time);
   const dayEndMin = toMinutes(hours.end_time);
 
-  const { data: blocked } = await supabase.from('blocked_periods').select('*')
-    .eq('business_id', businessId)
-    .lte('starts_at', `${dateStr}T23:59:59Z`)
-    .gte('ends_at', `${dateStr}T00:00:00Z`);
-
-  const { data: existingBookings } = await supabase.from('bookings').select('*')
-    .eq('business_id', businessId)
-    .neq('status', 'cancelled')
-    .gte('starts_at', `${dateStr}T00:00:00Z`)
-    .lte('starts_at', `${dateStr}T23:59:59Z`);
+  const { data: blocked } = blockedRes;
+  const { data: existingBookings } = bookingsRes;
 
   const duration = service.duration_minutes;
   const slots = [];
